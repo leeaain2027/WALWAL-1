@@ -205,7 +205,7 @@ export default function App() {
             {/* Received Messages Section */}
             <div className="w-full space-y-4 relative z-10 pb-10">
               <h3 className="text-white font-bold text-lg flex items-center gap-2 mb-4">
-                <Sparkles size={20} /> 최근 입력
+                <Sparkles size={20} /> 최근 대화
               </h3>
               {receivedMessages.length > 0 ? (
                 receivedMessages.map((msg) => (
