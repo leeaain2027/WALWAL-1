@@ -9,3 +9,6 @@ data/
 
 .DS_Store
 node_modules
+front/.vite
+front/dist
+__pycache__
