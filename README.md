@@ -1,0 +1,2 @@
+- render.yaml: 프론트엔드를 render.com에 배포하기 위한 설정파일
+- fonrt 폴더: 프론트엔드 코드 모음

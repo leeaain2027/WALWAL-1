@@ -6,3 +6,6 @@ data/
 
 # 개인 가상환경
 .venv
+
+.DS_Store
+node_modules
