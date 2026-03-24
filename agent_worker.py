@@ -174,31 +174,40 @@ def send_message_to_server(message: str):
         print(f"⚠️ 전송 오류: {e}")
 
 # ── 메인 폴링 루프 ────────────────────────────────────────────────────
+import logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [worker] %(message)s", force=True)
+log = logging.getLogger(__name__)
+
+
 def main():
-    print(f"🐾 Agent Worker 시작 (서버: {RENDER_URL})")
+    log.info(f"🐾 Agent Worker 시작 (서버: {RENDER_URL})")
     last_processed_timestamp = None
 
     while True:
-        data = fetch_user_prompt()
-        timestamp = data.get("timestamp")
-        user_prompt = data.get("text", "").strip()
+        try:
+            data = fetch_user_prompt()
+            timestamp = data.get("timestamp")
+            user_prompt = data.get("text", "").strip()
 
-        if user_prompt and timestamp != last_processed_timestamp:
-            print(f"\n📩 새 입력: {user_prompt}")
-            last_processed_timestamp = timestamp
+            if user_prompt and timestamp != last_processed_timestamp:
+                log.info(f"📩 새 입력: {user_prompt}")
+                last_processed_timestamp = timestamp
 
-            if not is_safe(user_prompt):
-                print("🚫 안전하지 않은 입력")
-                send_message_to_server("죄송합니다, 해당 질문에는 답변드리기 어렵습니다.")
-            else:
-                result = workflow.stream({"messages": [("user", user_prompt)]})
-                for r in result:
-                    for key, value in r.items():
-                        print(f"\n[Node: {key}]")
-                        response = value.get("response", "")
-                        if response:
-                            print(f"🤖: {response}")
-                            send_message_to_server(response)
+                if not is_safe(user_prompt):
+                    log.info("🚫 안전하지 않은 입력")
+                    send_message_to_server("죄송합니다, 해당 질문에는 답변드리기 어렵습니다.")
+                else:
+                    result = workflow.stream({"messages": [("user", user_prompt)]})
+                    for r in result:
+                        for key, value in r.items():
+                            log.info(f"[Node: {key}]")
+                            response = value.get("response", "")
+                            if response:
+                                log.info(f"🤖: {response}")
+                                send_message_to_server(response)
+
+        except Exception as e:
+            log.error(f"❌ Worker 오류: {e}", exc_info=True)
 
         time.sleep(POLL_INTERVAL)
 
