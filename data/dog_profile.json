@@ -18,8 +18,8 @@
         "last_medical_check": "2025-12-15"
       },
       "preferences": {
-        "favorite_food": "salmon",
-        "fears": ["thunder", "cars"],
+        "favorite_food": ["연어", "오이", "닭가슴살"],
+        "fears": ["천둥소리", "자동차"],
         "walking_habit_min": 45
       }
     }
