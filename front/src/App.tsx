@@ -50,6 +50,7 @@ type ReceivedMessage = {
   id: string;
   text: string;
   timestamp: string;
+  question?: string;
 };
 
 export default function App() {
@@ -67,6 +68,8 @@ export default function App() {
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [serverDown, setServerDown] = useState(false);
+  const [lastQuestion, setLastQuestion] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch received messages from server
@@ -76,9 +79,12 @@ export default function App() {
       if (response.ok) {
         const data = await response.json();
         setReceivedMessages(data);
+        setServerDown(false);
+      } else {
+        setServerDown(true);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
+      setServerDown(true);
     }
   };
 
@@ -142,7 +148,7 @@ export default function App() {
       });
 
       if (response.ok) {
-        setInputText('');
+        setLastQuestion(inputText);
       } else {
         console.error("Save error:", await response.text());
       }
@@ -190,6 +196,7 @@ export default function App() {
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
+                  onFocus={() => setInputText('')}
                   placeholder={currentPlaceholder}
                   className="w-full py-5 px-8 bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl text-lg focus:outline-none focus:ring-4 focus:ring-app-yellow transition-all placeholder:text-gray-400"
                 />
@@ -207,17 +214,21 @@ export default function App() {
               <h3 className="text-white font-bold text-lg flex items-center gap-2 mb-4">
                 <Sparkles size={20} /> 최근 대화
               </h3>
-              {receivedMessages.length > 0 ? (
-                receivedMessages.map((msg) => (
-                  <motion.div
-                    key={msg.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="dog-thought-card"
-                  >
-                    "{msg.text}"
-                    <div className="text-[10px] text-gray-400 mt-1 text-right">
-                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {serverDown ? (
+                <div className="text-white text-center py-4 text-sm bg-white/20 rounded-2xl px-4">
+                  서버가 종료되었습니다. 운영자에게 문의해주세요.
+                </div>
+              ) : receivedMessages.length > 0 ? (
+                receivedMessages.map((msg, idx: number) => (
+                  <motion.div key={msg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                    {idx === 0 && lastQuestion && (
+                      <p className="text-white/70 text-xs mb-1 ml-1">{lastQuestion}</p>
+                    )}
+                    <div className="dog-thought-card">
+                      "{msg.text}"
+                      <div className="text-[10px] text-gray-400 mt-1 text-right">
+                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
                   </motion.div>
                 ))

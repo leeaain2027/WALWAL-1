@@ -1,7 +1,9 @@
 # 개인 환경 변수
 .env
+**/.env
 
 # 개인 data
+
 
 
 # 개인 가상환경
@@ -12,3 +14,4 @@ node_modules
 front/.vite
 front/dist
 __pycache__
+front/messages.json

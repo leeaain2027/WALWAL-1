@@ -2,5 +2,5 @@ services:
   - type: web
     name: walwal
     runtime: python
-    buildCommand: pip install fastapi "uvicorn[standard]" && cd front && npm install && npm run build
+    buildCommand: pip install --no-cache-dir fastapi "uvicorn[standard]" openai langchain-openai langgraph python-dotenv && cd front && npm install && npm run build && cd ..
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
