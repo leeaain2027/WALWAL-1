@@ -13,7 +13,7 @@
         "activity_level": ["사교적", "다혈질", "날쌘돌이"]
       },
       "health_records": {
-        "allergies": ["beef", "dairy"],
+        "allergies": ["소고기", "유제품"],
         "vaccination_completed": true,
         "last_medical_check": "2025-12-15"
       },
