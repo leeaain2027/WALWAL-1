@@ -145,24 +145,39 @@ Return True only if the prompt is genuinely about pets or pet care."""
         log.error(f"❌ 초기화 실패: {e}", exc_info=True)
         return
 
-    # ── 서버 통신 ───────────────────────────────────────────────────────
+    # ── 파일 직접 읽기/쓰기 (HTTP 자기요청 제거) ──────────────────────
+    from pathlib import Path
+    from datetime import datetime, timezone
+
+    BASE_DIR = Path(__file__).parent
+    USER_INPUT_FILE = BASE_DIR / "front" / "user_input.json"
+    MESSAGES_FILE = BASE_DIR / "front" / "messages.json"
+
     def fetch_user_prompt():
         try:
-            r = requests.get(f"{RENDER_URL}/api/input", timeout=10)
-            return r.json()
+            data = json.loads(USER_INPUT_FILE.read_text(encoding="utf-8"))
+            return data[-1] if data else {}
         except Exception as e:
             log.warning(f"입력 조회 실패: {e}")
             return {}
 
     def send_message_to_server(message: str):
         try:
-            r = requests.post(f"{RENDER_URL}/api/message", json={"text": message}, timeout=10)
-            if r.status_code == 201:
-                log.info(f"✅ 전송 성공: {r.json()}")
-            else:
-                log.warning(f"전송 실패 ({r.status_code}): {r.text}")
+            new_msg = {
+                "id": str(int(datetime.now(timezone.utc).timestamp() * 1000)),
+                "text": message,
+                "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            }
+            try:
+                messages = json.loads(MESSAGES_FILE.read_text(encoding="utf-8"))
+            except Exception:
+                messages = []
+            messages.insert(0, new_msg)
+            del messages[3:]
+            MESSAGES_FILE.write_text(json.dumps(messages, ensure_ascii=False, indent=2), encoding="utf-8")
+            log.info(f"✅ 메시지 저장: {message}")
         except Exception as e:
-            log.warning(f"전송 오류: {e}")
+            log.warning(f"메시지 저장 실패: {e}")
 
     # ── 폴링 루프 ───────────────────────────────────────────────────────
     log.info(f"🔄 폴링 시작 (서버: {RENDER_URL}, 간격: {POLL_INTERVAL}초)")
