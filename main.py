@@ -1,4 +1,6 @@
 import json
+import threading
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -7,7 +9,17 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-app = FastAPI()
+from agent_worker import main as worker_main
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    thread = threading.Thread(target=worker_main, daemon=True)
+    thread.start()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 DIST_DIR = Path(__file__).parent / "front" / "dist"
 USER_INPUT_FILE = Path(__file__).parent / "front" / "user_input.json"
