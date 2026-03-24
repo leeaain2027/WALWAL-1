@@ -10,8 +10,7 @@
       "characteristics": {
         "coat_color": "Brown",
         "size_category": "Small",
-        "activity_level": "다소 활동적",
-        "sociability": "매우 사교적인 성격"
+        "activity_level": ["사교적", "다혈질", "날쌘돌이"]
       },
       "health_records": {
         "allergies": ["beef", "dairy"],
