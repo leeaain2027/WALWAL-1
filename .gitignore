@@ -13,3 +13,4 @@ node_modules
 front/.vite
 front/dist
 __pycache__
+front/messages.json
