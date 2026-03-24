@@ -4,8 +4,9 @@
       "name": "초코",
       "breed": "푸들",
       "gender": "Female",
-      "is_neutered": true,
+      "is_neutered": 1,
       "birth_date": "2023-05-10",
+      "is_alive": 0,
       "weight_kg": 4.5,
       "characteristics": {
         "coat_color": "Brown",
