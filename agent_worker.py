@@ -4,7 +4,7 @@ import time
 import logging
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "Aa_in", ".env"))
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [worker] %(message)s", force=True)
 log = logging.getLogger(__name__)
