@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: walwal
+    runtime: python
+    buildCommand: pip install fastapi "uvicorn[standard]" && cd front && npm install && npm run build
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
