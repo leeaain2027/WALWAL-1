@@ -1,6 +1,7 @@
 {
     "pet_profile": {
-      "id": "DOG-001",
+      "guardian_id": "USER-001",
+      "pet_id": "DOG-001",
       "name": "초코",
       "breed": "푸들",
       "gender": "Female",
