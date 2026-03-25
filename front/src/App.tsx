@@ -69,7 +69,8 @@ export default function App() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [serverDown, setServerDown] = useState(false);
-  const [lastQuestion, setLastQuestion] = useState('');
+  const [, setLastQuestion] = useState('');
+  const [debugInfo, setDebugInfo] = useState<Record<string, any>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Fetch received messages from server
@@ -88,15 +89,25 @@ export default function App() {
     }
   };
 
+  const fetchDebugInfo = async () => {
+    try {
+      const response = await fetch('/api/debug');
+      if (response.ok) setDebugInfo(await response.json());
+    } catch (_) {}
+  };
+
   useEffect(() => {
-    // Randomly select dog image and placeholder on mount
     const randomImg = DOG_IMAGES[Math.floor(Math.random() * DOG_IMAGES.length)];
     const randomPlaceholder = PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)];
     setCurrentDogImage(randomImg);
     setCurrentPlaceholder(randomPlaceholder);
 
     fetchReceivedMessages();
-    const interval = setInterval(fetchReceivedMessages, 5000); // Poll every 5s
+    fetchDebugInfo();
+    const interval = setInterval(() => {
+      fetchReceivedMessages();
+      fetchDebugInfo();
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -157,7 +168,42 @@ export default function App() {
     }
   };
 
+  const agentLabel: Record<string, string> = {
+    agent1: 'Agent1 · 건강/상태',
+    agent2: 'Agent2 · 행동',
+    agent3: 'Agent3 · 서비스',
+    agent4: 'Agent4 · 컴플레인',
+    agent5: 'Agent5 · 기타',
+  };
+
   return (
+    <>
+    {/* 개발자 로그 패널 */}
+    <div className="fixed top-4 right-4 w-64 bg-gray-900 text-green-400 text-xs rounded-xl p-3 shadow-2xl z-50 font-mono opacity-90">
+      <div className="text-gray-400 mb-2 text-[10px] uppercase tracking-widest">Dev Log</div>
+      {debugInfo.agent ? (
+        <>
+          <div className="mb-1">
+            <span className="text-gray-500">agent </span>
+            <span className="text-yellow-300">{agentLabel[debugInfo.agent] ?? debugInfo.agent}</span>
+          </div>
+          <div className="text-gray-500 text-[10px] mb-1">{debugInfo.timestamp?.slice(11, 19)} UTC</div>
+          <div className="border-t border-gray-700 pt-2 space-y-1">
+            {debugInfo.state && Object.entries(debugInfo.state).map(([k, v]) => (
+              v ? (
+                <div key={k}>
+                  <span className="text-gray-500">{k}: </span>
+                  <span className="text-green-300 break-all">{String(v)}</span>
+                </div>
+              ) : null
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="text-gray-600">대기 중...</div>
+      )}
+    </div>
+
     <div className="flex flex-col h-screen max-w-md mx-auto bg-white overflow-hidden shadow-2xl border-x border-gray-100">
       <AnimatePresence mode="wait">
         {page === 'home' ? (
@@ -219,10 +265,10 @@ export default function App() {
                   서버가 종료되었습니다. 운영자에게 문의해주세요.
                 </div>
               ) : receivedMessages.length > 0 ? (
-                receivedMessages.map((msg, idx: number) => (
+                receivedMessages.map((msg) => (
                   <motion.div key={msg.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                    {idx === 0 && lastQuestion && (
-                      <p className="text-white/70 text-xs mb-1 ml-1">{lastQuestion}</p>
+                    {msg.question && (
+                      <p className="text-gray-500 text-xs mb-1 ml-1 font-mono">Q: {msg.question}</p>
                     )}
                     <div className="dog-thought-card">
                       "{msg.text}"
@@ -373,5 +419,6 @@ export default function App() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }

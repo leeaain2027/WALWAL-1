@@ -24,6 +24,7 @@ app = FastAPI(lifespan=lifespan)
 DIST_DIR = Path(__file__).parent / "front" / "dist"
 USER_INPUT_FILE = Path(__file__).parent / "front" / "user_input.json"
 MESSAGES_FILE = Path(__file__).parent / "front" / "messages.json"
+DEBUG_FILE = Path(__file__).parent / "front" / "debug.json"
 
 
 def load_messages() -> list[dict]:
@@ -67,6 +68,14 @@ def post_message(msg: MessageIn):
 @app.get("/api/message")
 def get_messages():
     return load_messages()
+
+
+@app.get("/api/debug")
+def get_debug():
+    try:
+        return json.loads(DEBUG_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 @app.get("/api/input")

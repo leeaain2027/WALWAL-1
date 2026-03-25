@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --color-app-cyan: #80CBC4; /* Toned down mint */
-  --color-app-yellow: #FFF59D; /* Softer yellow */
-  --color-kakao-bg: #FDF5E6; /* Warm cream background for "cute" feel */
-  --color-kakao-bubble: #FFFFFF;
-  --color-kakao-user-bubble: #FFECB3;
+  --color-app-cyan: #111827;       /* gray-900 — 터미널 배경 */
+  --color-app-yellow: #4ade80;     /* green-400 — 강조 */
+  --color-kakao-bg: #1f2937;       /* gray-800 — 채팅 배경 */
+  --color-kakao-bubble: #1f2937;
+  --color-kakao-user-bubble: #14532d; /* green-900 — 사용자 말풍선 */
 }
 
 body {
-  @apply bg-gray-50 text-gray-900 font-sans;
+  @apply bg-gray-900 text-green-400 font-mono;
 }
 
 .chat-bubble-left {
-  @apply relative bg-white p-4 rounded-3xl rounded-tl-none text-sm max-w-[80%] shadow-sm border border-pink-100 whitespace-pre-wrap;
+  @apply relative bg-gray-800 p-4 rounded-3xl rounded-tl-none text-sm max-w-[80%] shadow-sm border border-gray-700 text-green-300 whitespace-pre-wrap;
 }
 
 .chat-bubble-right {
-  @apply relative bg-app-yellow p-4 rounded-3xl rounded-tr-none text-sm max-w-[80%] shadow-sm border border-yellow-200 whitespace-pre-wrap;
+  @apply relative bg-green-900 p-4 rounded-3xl rounded-tr-none text-sm max-w-[80%] shadow-sm border border-green-700 text-green-200 whitespace-pre-wrap;
 }
 
 .dog-thought-card {
-  @apply bg-white/40 backdrop-blur-md p-4 rounded-2xl border border-white/50 shadow-sm text-gray-700 italic text-sm whitespace-pre-wrap;
+  @apply bg-gray-800 backdrop-blur-md p-4 rounded-2xl border border-gray-700 shadow-sm text-green-300 italic text-sm font-mono whitespace-pre-wrap;
 }

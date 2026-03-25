@@ -202,6 +202,18 @@ Return True for everything else, including general questions, service inquiries,
     BASE_DIR = Path(__file__).parent
     USER_INPUT_FILE = BASE_DIR / "front" / "user_input.json"
     MESSAGES_FILE = BASE_DIR / "front" / "messages.json"
+    DEBUG_FILE = BASE_DIR / "front" / "debug.json"
+
+    def save_debug(agent: str, state: dict):
+        try:
+            entry = {
+                "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+                "agent": agent,
+                "state": {k: v for k, v in state.items() if k != "messages"},
+            }
+            DEBUG_FILE.write_text(json.dumps(entry, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as e:
+            log.warning(f"디버그 저장 실패: {e}")
 
     def fetch_user_prompt():
         try:
@@ -211,11 +223,12 @@ Return True for everything else, including general questions, service inquiries,
             log.warning(f"입력 조회 실패: {e}")
             return {}
 
-    def send_message_to_server(message: str):
+    def send_message_to_server(message: str, question: str = ""):
         try:
             new_msg = {
                 "id": str(int(datetime.now(timezone.utc).timestamp() * 1000)),
                 "text": message,
+                "question": question,
                 "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             }
             try:
@@ -245,7 +258,7 @@ Return True for everything else, including general questions, service inquiries,
 
                 if not is_safe(user_prompt):
                     log.info("🚫 안전하지 않은 입력")
-                    send_message_to_server("죄송합니다, 해당 질문에는 답변드리기 어렵습니다.")
+                    send_message_to_server("죄송합니다, 해당 질문에는 답변드리기 어렵습니다.", user_prompt)
                 else:
                     for r in workflow.stream({"messages": [("user", user_prompt)]}):
                         for key, value in r.items():
@@ -253,7 +266,8 @@ Return True for everything else, including general questions, service inquiries,
                             response = value.get("response", "")
                             if response:
                                 log.info(f"🤖: {response}")
-                                send_message_to_server(response)
+                                save_debug(key, value)
+                                send_message_to_server(response, user_prompt)
 
         except Exception as e:
             log.error(f"❌ 루프 오류: {e}", exc_info=True)
