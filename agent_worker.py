@@ -14,6 +14,8 @@ POLL_INTERVAL = 5  # 초
 
 
 def main():
+    log.info("🐾 Agent Worker 10초 후 초기화 시작 (서버 안정화 대기)...")
+    time.sleep(10)
     log.info("🐾 Agent Worker 초기화 중...")
 
     try:
