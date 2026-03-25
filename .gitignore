@@ -3,6 +3,9 @@
 **/.env
 
 # 개인 data
+Data/
+data_processed/
+lancedb_store/
 
 
 
